@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USER
+// ─────────────────────────────────────────────────────────────────────────────
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String        // bcrypt hash
+  name         String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  reservations Reservation[]
+  orders       Order[]
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PRODUCT
+// Each product has a fixed totalStock; availableStock is derived at query time
+// from: totalStock - activeReservedQuantity. This prevents ghost stock.
+// ─────────────────────────────────────────────────────────────────────────────
+model Product {
+  id            String         @id @default(uuid())
+  name          String
+  description   String
+  price         Decimal        @db.Decimal(10, 2)
+  imageUrl      String?
+  totalStock    Int            // never changes after creation
+  currentStock  Int            // decremented on confirmed order, restored on expiry
+  reservedStock Int            @default(0) // temp hold; decremented on checkout/expiry
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  reservations  Reservation[]
+  orders        Order[]
+  inventoryLogs InventoryLog[]
+
+  // Guard: currentStock + reservedStock must never exceed totalStock
+  // This is enforced in service layer + DB transaction
+
+  @@map("products")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RESERVATION
+// A temporary hold on stock.  Expires after RESERVATION_TTL_MINUTES (5 min).
+// Status transitions: PENDING → COMPLETED | EXPIRED | CANCELLED
+// ─────────────────────────────────────────────────────────────────────────────
+model Reservation {
+  id          String            @id @default(uuid())
+  userId      String
+  productId   String
+  quantity    Int
+  status      ReservationStatus @default(PENDING)
+  expiresAt   DateTime          // createdAt + 5 minutes
+  completedAt DateTime?
+  cancelledAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+  order   Order?
+
+  // Prevent a user from holding multiple PENDING reservations for the same product
+  @@unique([userId, productId, status], name: "unique_active_reservation")
+  @@index([status, expiresAt])  // fast expiry sweeps
+  @@index([userId])
+  @@index([productId])
+
+  @@map("reservations")
+}
+
+enum ReservationStatus {
+  PENDING
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ORDER
+// Created when reservation is checked out.  Reservation → Order is 1:1.
+// ─────────────────────────────────────────────────────────────────────────────
+model Order {
+  id            String      @id @default(uuid())
+  userId        String
+  productId     String
+  reservationId String      @unique
+  quantity      Int
+  unitPrice     Decimal     @db.Decimal(10, 2)
+  totalPrice    Decimal     @db.Decimal(10, 2)
+  status        OrderStatus @default(CONFIRMED)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id])
+  product     Product     @relation(fields: [productId], references: [id])
+  reservation Reservation @relation(fields: [reservationId], references: [id])
+
+  @@index([userId])
+  @@index([productId])
+
+  @@map("orders")
+}
+
+enum OrderStatus {
+  CONFIRMED
+  FULFILLED
+  REFUNDED
+  CANCELLED
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INVENTORY LOG  (audit trail)
+// Every stock mutation is written here for full auditability.
+// ─────────────────────────────────────────────────────────────────────────────
+model InventoryLog {
+  id            String         @id @default(uuid())
+  productId     String
+  eventType     InventoryEvent
+  quantityDelta Int            // positive = stock added, negative = stock deducted
+  stockBefore   Int
+  stockAfter    Int
+  reservationId String?        // null for manual adjustments
+  orderId       String?
+  note          String?
+  createdAt     DateTime       @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([productId, createdAt])
+  @@index([eventType])
+
+  @@map("inventory_logs")
+}
+
+enum InventoryEvent {
+  RESERVED        // stock temporarily held
+  RESERVATION_EXPIRED  // stock restored after timeout
+  RESERVATION_CANCELLED
+  ORDER_CONFIRMED  // stock permanently deducted
+  MANUAL_ADJUSTMENT
+}
