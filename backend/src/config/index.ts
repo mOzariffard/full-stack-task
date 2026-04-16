@@ -3,8 +3,8 @@ import { z } from 'zod';
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.string().transform(Number).default('4000'),
-  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
-  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required').optional(),
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters').optional(),
   JWT_EXPIRES_IN: z.string().default('7d'),
   RESERVATION_TTL_MINUTES: z.string().transform(Number).default('5'),
   RATE_LIMIT_WINDOW_MS: z.string().transform(Number).default('60000'),
@@ -21,12 +21,21 @@ if (!parsed.success) {
   process.exit(1);
 }
 
+const isTest = parsed.data.NODE_ENV === 'test';
+const databaseUrl = parsed.data.DATABASE_URL || (isTest ? 'postgresql://test:test@localhost:5432/test' : '');
+const jwtSecret = parsed.data.JWT_SECRET || (isTest ? 'test-secret-key-at-least-32-characters-long-for-tests' : '');
+
+if (!isTest && (!databaseUrl || !jwtSecret)) {
+  console.error('❌ DATABASE_URL and JWT_SECRET are required in non-test environments');
+  process.exit(1);
+}
+
 export const config = {
   env: parsed.data.NODE_ENV,
   port: parsed.data.PORT,
-  databaseUrl: parsed.data.DATABASE_URL,
+  databaseUrl: databaseUrl,
   jwt: {
-    secret: parsed.data.JWT_SECRET,
+    secret: jwtSecret,
     expiresIn: parsed.data.JWT_EXPIRES_IN,
   },
   reservation: {
@@ -41,5 +50,5 @@ export const config = {
   },
   logLevel: parsed.data.LOG_LEVEL,
   isProduction: parsed.data.NODE_ENV === 'production',
-  isTest: parsed.data.NODE_ENV === 'test',
+  isTest: isTest,
 } as const;
