@@ -11,7 +11,7 @@ const config: Config = {
   collectCoverageFrom: ['src/**/*.ts', '!src/index.ts'],
   coverageDirectory: 'coverage',
   verbose: true,
-  setupFilesAfterFramework: [],
+  setupFilesAfterEnv: [],
 };
 
 export default config;
