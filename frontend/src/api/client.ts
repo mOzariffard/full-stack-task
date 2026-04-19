@@ -1,6 +1,6 @@
 import type { ApiResponse } from '../types';
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? '/api/v1';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 const DEFAULT_TIMEOUT_MS = 10_000;
 
 // ── Token storage ─────────────────────────────────────────────────────────────

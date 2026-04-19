@@ -1,5 +1,7 @@
+'use client';
+
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import { AuthModal } from './AuthModal';
 
@@ -15,14 +17,14 @@ export function Navbar() {
     <>
       <header className="navbar">
         <div className="navbar__inner">
-          <Link to="/" className="navbar__logo">
+          <Link href="/" className="navbar__logo">
             ⚡ <span>DropSystem</span>
           </Link>
 
           <nav className="navbar__nav">
-            <Link to="/" className="navbar__link">Drops</Link>
+            <Link href="/" className="navbar__link">Drops</Link>
             {isAuthenticated && (
-              <Link to="/my-reservations" className="navbar__link">My Reservations</Link>
+              <Link href="/my-reservations" className="navbar__link">My Reservations</Link>
             )}
           </nav>
 

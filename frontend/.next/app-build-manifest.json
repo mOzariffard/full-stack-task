@@ -1,0 +1,43 @@
+{
+  "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-b42c783ed28b6be6.js",
+      "static/chunks/618f8807-5c6e9f024e3bc9e7.js",
+      "static/chunks/364-3680b7b74b115232.js",
+      "static/chunks/main-app-fce02266e38fe4ed.js",
+      "static/chunks/app/_not-found/page-047f3bd5a59e69e5.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack-b42c783ed28b6be6.js",
+      "static/chunks/618f8807-5c6e9f024e3bc9e7.js",
+      "static/chunks/364-3680b7b74b115232.js",
+      "static/chunks/main-app-fce02266e38fe4ed.js",
+      "static/css/5564f8be4ddcefd8.css",
+      "static/chunks/0-de233f795d29e0af.js",
+      "static/chunks/app/layout-66035d36c8a031b8.js"
+    ],
+    "/my-reservations/page": [
+      "static/chunks/webpack-b42c783ed28b6be6.js",
+      "static/chunks/618f8807-5c6e9f024e3bc9e7.js",
+      "static/chunks/364-3680b7b74b115232.js",
+      "static/chunks/main-app-fce02266e38fe4ed.js",
+      "static/chunks/0-de233f795d29e0af.js",
+      "static/chunks/app/my-reservations/page-aa122863462c6583.js"
+    ],
+    "/drop/[productId]/page": [
+      "static/chunks/webpack-b42c783ed28b6be6.js",
+      "static/chunks/618f8807-5c6e9f024e3bc9e7.js",
+      "static/chunks/364-3680b7b74b115232.js",
+      "static/chunks/main-app-fce02266e38fe4ed.js",
+      "static/chunks/app/drop/[productId]/page-dffde144efb67f27.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-b42c783ed28b6be6.js",
+      "static/chunks/618f8807-5c6e9f024e3bc9e7.js",
+      "static/chunks/364-3680b7b74b115232.js",
+      "static/chunks/main-app-fce02266e38fe4ed.js",
+      "static/chunks/0-de233f795d29e0af.js",
+      "static/chunks/app/page-add7385fd73e7ae8.js"
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import type { Product } from '../types';
 import { StockDisplay } from './StockDisplay';
 
@@ -11,7 +11,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link
-      to={`/drop/${product.id}`}
+      href={`/drop/${product.id}`}
       className={`product-card ${soldOut ? 'product-card--sold-out' : ''}`}
     >
       <div className="product-card__image-wrapper">

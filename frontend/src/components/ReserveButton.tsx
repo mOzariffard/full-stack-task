@@ -1,3 +1,5 @@
+'use client';
+
 import type { Reservation } from '../types';
 
 interface ReserveButtonProps {

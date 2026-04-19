@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useCallback, useEffect } from 'react';
 import { reservationsApi } from '../api/reservations';
 import { ApiError } from '../api/client';

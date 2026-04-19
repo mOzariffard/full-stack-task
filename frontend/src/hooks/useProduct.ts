@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { productsApi } from '../api/products';
 import { ApiError } from '../api/client';
