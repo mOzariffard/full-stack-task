@@ -368,7 +368,7 @@ GET https://drop-system-api.onrender.com/api/v1/health
 - Recommended root install command (fixes npm optional Rollup binary resolution on musl):
   - `npm run install:pxxl`
 - Recommended root build command:
-  - `npm run build --workspace=backend && npm run build --workspace=frontend`
+  - `npm run build` (equivalent to `npm run build --workspace=backend && npm run build --workspace=frontend`)
 - Recommended root start command:
   - `npm start`
   - (runs `prisma migrate deploy` and then starts backend server)
