@@ -27,6 +27,13 @@ export const apiLimiter = createLimiter(
   'Too many requests, please try again later'
 );
 
+// Permissive limiter for serving static HTML (SPA fallback)
+export const staticLimiter = createLimiter(
+  60 * 1000, // 1 minute
+  300,
+  'Too many requests, please try again later'
+);
+
 // Strict limiter for auth endpoints
 export const authLimiter = createLimiter(
   15 * 60 * 1000, // 15 minutes

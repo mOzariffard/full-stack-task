@@ -2,10 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
+import path from 'path';
 import { config } from './config';
 import { requestLogger } from './middleware/requestLogger';
 import { errorHandler } from './middleware/errorHandler';
-import { apiLimiter } from './middleware/rateLimiter';
+import { apiLimiter, staticLimiter } from './middleware/rateLimiter';
 import routes from './routes';
 
 export function createApp() {
@@ -46,14 +47,26 @@ export function createApp() {
 
   app.use('/api/v1', routes);
 
-  // ── 404 handler ─────────────────────────────────────────────────────────
+  // ── Serve frontend (production) ──────────────────────────────────────────
 
-  app.use((_req, res) => {
-    res.status(404).json({
-      success: false,
-      error: { code: 'NOT_FOUND', message: 'Route not found' },
+  if (config.isProduction) {
+    // __dirname is backend/dist — frontend/dist is two levels up
+    const frontendDist = path.join(__dirname, '../../frontend/dist');
+    app.use(express.static(frontendDist));
+    // SPA fallback: send index.html for any non-API route
+    app.get('*', staticLimiter, (_req, res) => {
+      res.sendFile(path.join(frontendDist, 'index.html'));
     });
-  });
+  } else {
+    // ── 404 handler (dev only — production serves SPA) ──────────────────
+
+    app.use((_req, res) => {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Route not found' },
+      });
+    });
+  }
 
   // ── Centralized error handler (MUST be last) ─────────────────────────────
 
