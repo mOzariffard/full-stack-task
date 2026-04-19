@@ -5,8 +5,10 @@
   "workspaces": ["backend", "frontend"],
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "install:pxxl": "node -e \"const fs=require('fs');for(const p of ['node_modules','package-lock.json'])fs.rmSync(p,{recursive:true,force:true});\" && npm install",
     "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
-    "test": "npm run test --workspace=backend"
+    "test": "npm run test --workspace=backend",
+    "start": "npm run prisma:deploy --workspace=backend && npm run start --workspace=backend"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

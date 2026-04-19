@@ -362,6 +362,28 @@ GET https://drop-system-api.onrender.com/api/v1/health
 # Every 10 minutes
 ```
 
+### Pxxl App notes (monorepo deployment)
+
+- This repository is **Express + Vite**, not Next.js, so there is no `next.config.js` in source.
+- Recommended root install command (fixes npm optional Rollup binary resolution on musl):
+  - `npm run install:pxxl`
+- Recommended root build command:
+  - `npm run build` (equivalent to `npm run build --workspace=backend && npm run build --workspace=frontend`)
+- Recommended root start command:
+  - `npm start`
+  - (runs `prisma migrate deploy` and then starts backend server)
+- Ensure these env vars are set in Pxxl:
+  - `NODE_ENV=production`
+  - `PORT` (if your environment requires explicit port assignment)
+  - `DATABASE_URL`
+  - `JWT_SECRET` (32+ chars)
+  - `JWT_EXPIRES_IN`
+  - `RESERVATION_TTL_MINUTES`
+  - `RATE_LIMIT_WINDOW_MS`
+  - `RATE_LIMIT_MAX`
+  - `CORS_ORIGIN`
+  - `LOG_LEVEL`
+
 ---
 
 ## 📜 Trade-offs Summary
