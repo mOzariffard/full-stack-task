@@ -7,23 +7,14 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# ── Production: serve with nginx ──────────────────────────────────────────────
-FROM nginx:alpine AS runner
+# ── Production: serve with Next.js standalone ────────────────────────────────
+FROM node:20-alpine AS runner
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+WORKDIR /app
 
-# React Router support — redirect all routes to index.html
-RUN printf 'server {\n\
-  listen 80;\n\
-  root /usr/share/nginx/html;\n\
-  index index.html;\n\
-  location / {\n\
-    try_files $uri $uri/ /index.html;\n\
-  }\n\
-  location /api {\n\
-    proxy_pass http://backend:4000;\n\
-  }\n\
-}' > /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 3000
+CMD ["node", "server.js"]

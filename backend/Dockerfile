@@ -19,7 +19,7 @@ FROM base AS runner
 ENV NODE_ENV=production
 
 # Copy production deps
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/node_modules ./node_modules
 # Copy compiled output
 COPY --from=builder /app/dist ./dist
 # Copy prisma schema + generated client
@@ -35,4 +35,4 @@ EXPOSE 4000
 
 # Keep as root for migrations and node_modules access during startup
 # Run migrations then start the server
-CMD ["sh", "-c", "npx prisma migrate deploy --skip-generate && node dist/index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
