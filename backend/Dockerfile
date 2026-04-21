@@ -31,8 +31,6 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 appuser
 
-EXPOSE 4000
-
 # Keep as root for migrations and node_modules access during startup
 # Run migrations then start the server
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
