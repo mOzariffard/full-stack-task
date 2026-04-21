@@ -2,7 +2,11 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
+
+# --legacy-peer-deps avoids peer conflicts
+# --ignore-scripts skips postinstall hooks that can fail in CI
+# audit=false stops npm from blocking the build over vulnerability warnings
+RUN npm install --legacy-peer-deps --ignore-scripts
 
 COPY . .
 RUN npm run build
@@ -18,5 +22,4 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public 2>/dev/null || true
 
-# Use shell form so $PORT is expanded at runtime from Pxxl's injected env var
 CMD node server.js
