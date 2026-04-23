@@ -1,12 +1,9 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-COPY package*.json ./
-
-# --legacy-peer-deps avoids peer conflicts
-# --ignore-scripts skips postinstall hooks that can fail in CI
-# audit=false stops npm from blocking the build over vulnerability warnings
-RUN npm install --legacy-peer-deps --ignore-scripts
+# Copy lockfile first - npm ci will use it exactly, no dependency resolution = no Vite conflict
+COPY package*.json package-lock.json ./
+RUN npm ci --ignore-scripts
 
 COPY . .
 RUN npm run build
