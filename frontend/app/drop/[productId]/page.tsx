@@ -176,6 +176,12 @@ function DropPage({ productId }: DropPageProps) {
   );
 }
 
+export function generateStaticParams() {
+  return [];
+}
+
+export const dynamicParams = false;
+
 export default function DropDetailPage({ params }: { params: { productId: string } }) {
   return <DropPage productId={params.productId} />;
 }
