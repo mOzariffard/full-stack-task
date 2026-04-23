@@ -1,9 +1,23 @@
+# Dependencies
 node_modules/
-dist/
+
+# Next.js build output — NEVER commit this
+.next/
+out/
+
+# Environment files
 .env
 .env.local
+.env.production.local
+.env.development.local
+
+# Logs
 *.log
-coverage/
+npm-debug.log*
+
+# OS
 .DS_Store
 *.pem
+
+# Cache
 .cache/

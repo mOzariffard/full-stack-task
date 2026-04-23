@@ -2,7 +2,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package*.json package-lock.json ./
-RUN npm ci --ignore-scripts
+RUN npm ci --ignore-scripts --no-audit
 
 COPY . .
 RUN npm run build
@@ -13,13 +13,10 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy standalone build
+# Use the fresh standalone build (not the committed one)
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public 2>/dev/null || true
 
-# Copy our custom server that correctly reads PORT from env
-COPY --from=builder /app/server-start.js ./server-start.js
-
-# Use custom server — reads PORT env var injected by Pxxl at runtime
-CMD ["node", "server-start.js"]
+# Next.js standalone server.js already reads PORT and HOSTNAME from env
+CMD ["node", "server.js"]
