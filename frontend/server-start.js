@@ -3,12 +3,13 @@
 
 const { createServer } = require('http');
 const { parse } = require('url');
-const next = require('./node_modules/next/dist/server/next.js');
+const next = require('./.next/standalone/node_modules/next/dist/server/next.js');
 
 const port = parseInt(process.env.PORT || '3000', 10);
 const hostname = '0.0.0.0';
 
 const app = next.default({
+  dir: './.next/standalone',
   dev: false,
   hostname,
   port,
