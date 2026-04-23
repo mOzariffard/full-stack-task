@@ -8,15 +8,10 @@ COPY . .
 RUN npm run build
 
 # ── Production ────────────────────────────────────────────────────────────────
-FROM node:20-alpine AS runner
-WORKDIR /app
+FROM nginx:alpine AS runner
 
-ENV NODE_ENV=production
+# Copy the static export to nginx's default public folder
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Use the fresh standalone build (not the committed one)
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public 2>/dev/null || true
-
-# Next.js standalone server.js already reads PORT and HOSTNAME from env
-CMD ["node", "server.js"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
